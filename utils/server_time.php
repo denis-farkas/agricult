@@ -62,8 +62,11 @@ function getServerTime() {
     $weather = determineWeather($currentSeason);
     $temperature = generateTemperature($currentSeason, $weather, $serverHour);
 
+    // Determine if it is day or night
+    $isDay = generateDayNight($currentSeason, $serverHour);
+
     return [
-        'serverTime' => date('Y-m-d H:i', $serverTime),
+        'serverTime' => date('d-m-Y H:i', $serverTime),
         'serverYear' => $serverYear,
         'serverMonth' => $serverMonth,
         'serverDay' => $serverDay,
@@ -71,7 +74,8 @@ function getServerTime() {
         'serverMinute' => $serverMinute,
         'currentSeason' => $currentSeason,
         'weather' => $weather,
-        'temperature' => $temperature
+        'temperature' => $temperature,
+        'isDay' => $isDay
     ];
 }
 
@@ -93,7 +97,7 @@ function determineWeather($season) {
     }
 }
 
-function generateTemperature($season, $weather, $hour) {
+function generateTemperature($season, $weather, $isDay) {
     global $weatherCoefficients;
 
     $coefficients = $weatherCoefficients[$season];
@@ -116,11 +120,26 @@ function generateTemperature($season, $weather, $hour) {
     }
 
     // Adjust temperature based on time of day
-    if ($hour >= 6 && $hour < 18) {
+    if ($isDay) {
         $baseTemp += 3; // Daytime adjustment
     } else {
         $baseTemp -= 3; // Nighttime adjustment
     }
 
     return $baseTemp;
+}
+
+function generateDayNight($season, $hour) {
+    switch ($season) {
+        case 'Hiver': // Winter
+            return ($hour >= 8 && $hour < 17);
+        case 'Printemps': // Spring
+            return ($hour >= 6.5 && $hour < 20);
+        case 'Eté': // Summer
+            return ($hour >= 5.5 && $hour < 21.5);
+        case 'Automne': // Autumn
+            return ($hour >= 7 && $hour < 18.5);
+        default:
+            return false;
+    }
 }

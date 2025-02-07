@@ -14,12 +14,4 @@ class Time extends Controller {
         echo json_encode($serverTimeData);
     }
 
-     public function saveServerTime() {
-        $serverTimeData = getServerTime();
-        if ($this->timeModel->saveServerTime($serverTimeData)) {
-            echo json_encode(['status' => 'success']);
-        } else {
-            echo json_encode(['status' => 'error']);
-        }
-    }
 }
