@@ -11,25 +11,11 @@ class Pages extends Controller {
     }
 
     public function index() {
-        $serverTimeData = getServerTime();
-        $data = [
-            'serverTime' => $serverTimeData['serverTime'],
-            'serverYear' => $serverTimeData['serverYear'],
-            'serverMonth' => $serverTimeData['serverMonth'],
-            'serverDay' => $serverTimeData['serverDay'],
-            'serverHour' => $serverTimeData['serverHour'],
-            'serverMinute' => $serverTimeData['serverMinute'],
-            'currentSeason' => $serverTimeData['currentSeason'],
-            'weather' => $serverTimeData['weather'],
-            'temperature' => $serverTimeData['temperature']
-        ];
+        
 
-        $this->view('main/index', $data);
+        $this->view('main/index');
 
     }
 
-    public function getServerTimeData() {
-        $serverTimeData = getServerTime();
-        echo json_encode($serverTimeData);
-    }
+    
 }

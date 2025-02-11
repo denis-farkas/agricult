@@ -58,12 +58,12 @@ function getServerTime() {
     $seasons = ['Hiver', 'Printemps', 'Eté', 'Automne'];
     $currentSeason = $seasons[($seasonNumber - 1) % 4];
 
-    // Determine the weather condition and temperature
-    $weather = determineWeather($currentSeason);
-    $temperature = generateTemperature($currentSeason, $weather, $serverHour);
-
     // Determine if it is day or night
     $isDay = generateDayNight($currentSeason, $serverHour);
+
+    // Determine the weather condition and temperature
+    $weather = determineWeather($currentSeason, $isDay);
+    $temperature = generateTemperature($currentSeason, $weather, $isDay);
 
     return [
         'serverTime' => date('d-m-Y H:i', $serverTime),
@@ -79,21 +79,31 @@ function getServerTime() {
     ];
 }
 
-function determineWeather($season) {
+function determineWeather($season, $isDay) {
     global $weatherCoefficients;
 
     $coefficients = $weatherCoefficients[$season];
     $totalCoeff = $coefficients['sun'] + $coefficients['rain'] + $coefficients['snow'] + $coefficients['fog'];
-    $random = rand(1, $totalCoeff);
+    $weather = rand(1, $totalCoeff);
 
-    if ($random <= $coefficients['sun']) {
-        return 'sun';
-    } elseif ($random <= $coefficients['sun'] + $coefficients['rain']) {
-        return 'rain';
-    } elseif ($random <= $coefficients['sun'] + $coefficients['rain'] + $coefficients['snow']) {
-        return 'snow';
+    if ($isDay) {
+        if ($weather <= $coefficients['sun']) {
+            return 'sun';
+        } elseif ($weather <= $coefficients['sun'] + $coefficients['rain']) {
+            return 'rain';
+        } elseif ($weather <= $coefficients['sun'] + $coefficients['rain'] + $coefficients['fog']) {
+            return 'fog';
+        } else {
+            return 'snow';
+        }
     } else {
-        return 'fog';
+        if ($weather <= $coefficients['rain']) {
+            return 'rain';
+        } elseif ($weather <= $coefficients['rain'] + $coefficients['fog']) {
+            return 'fog';
+        } else {
+            return 'snow';
+        }
     }
 }
 
